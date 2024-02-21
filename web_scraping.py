@@ -1,9 +1,11 @@
 from bs4 import BeautifulSoup as soup
+from pdf_scraping import PDF_scraper
 import requests as req
 import os
 
 def load_data(url, limitFile):
     index = 1
+    text = {}
 
     response = req.get(url)
 
@@ -42,9 +44,14 @@ def load_data(url, limitFile):
                 
                 with open('pdf/' + file_name + '.pdf' , "wb") as f:
                     f.write(pdf_response.content)
-                    
+                
                 print("File " ,index ,": " ,pdf_fileName_str)  
+                
+                text[file_name] = PDF_scraper.text_scraper('pdf/' + file_name + '.pdf')
+                
                 index+=1    
 
         except:
             pass
+        
+    return text
