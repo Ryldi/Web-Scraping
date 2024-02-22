@@ -7,9 +7,7 @@ limit = input()
 
 url = 'https://arxiv.org/search/?query='+ search + '&searchtype=all&source=header'
 
-text = load_data(url, int(limit))
+load_data(url, int(limit), 1)
 
 # for file_name, text in text.items():
 #   print("TEXT FROM ", file_name + ": ", text)
-
-
