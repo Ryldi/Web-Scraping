@@ -1,13 +1,14 @@
 from web_scraping import load_data
 
-print("Search File:", end= " ")
+print("Search File [String]:", end= " ")
 search = input()
-print("Limit File:", end= " ")
+search.replace(' ', '+')
+print("Limit File [Integer]:", end= " ")
 limit = input()
+print("Save To [sql/csv]:", end= " ")
+save_to = input()
 
 url = 'https://arxiv.org/search/?query='+ search + '&searchtype=all&source=header'
 
-load_data(url, int(limit), 1)
+load_data(url, int(limit), 1, save_to)
 
-# for file_name, text in text.items():
-#   print("TEXT FROM ", file_name + ": ", text)

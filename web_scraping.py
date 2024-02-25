@@ -1,9 +1,10 @@
 from bs4 import BeautifulSoup as soup
 from pdf_scraping import PDF_scraper
+from pdf_autosave import PDF_autosave
 import requests as req
 import os
 
-def load_data(url, limitFile, index):
+def load_data(url, limitFile, index, save_to):
     text = {}
 
     response = req.get(url)
@@ -19,9 +20,12 @@ def load_data(url, limitFile, index):
             pdf_link = ''
             if 'pdf' in  link['href']:
 
+                text["file_name"] = []
+                text["file_content"] = []
+
                 # basecase: file limitation
                 if index > limitFile:
-                    break
+                    break 
 
                 pdf_link = link['href'] + '.pdf'
                 pdf_response = req.get(pdf_link)
@@ -46,14 +50,17 @@ def load_data(url, limitFile, index):
                 with open('pdf/' + file_name + '.pdf' , "wb") as f:
                     f.write(pdf_response.content)
                 
-                print("File " ,index ,": " ,pdf_fileName_str)  
-                
-                text[file_name] = PDF_scraper.text_scraper('pdf/' + file_name + '.pdf')
-                
-                index+=1
+                print("File " ,index ,": " ,pdf_fileName_str) 
 
                 # insert pdf content (string) into database
-                # print("File ", index , " content: " , text)
+                
+                text["file_name"].append(file_name)
+                text["file_content"].append(PDF_scraper.text_scraper('pdf/' + file_name + '.pdf').replace("\n", ""))
+
+                index+=1
+
+                # insert into database
+                PDF_autosave.auto_save(save_to, text)
 
         except:
             pass
@@ -62,7 +69,7 @@ def load_data(url, limitFile, index):
     try:
         next_link = file.find('a', class_='pagination-next')
         next_url = 'https://arxiv.org' + next_link['href']
-        load_data(next_url, limitFile, index)
+        load_data(next_url, limitFile, index, save_to)
 
     except:
         exit()
